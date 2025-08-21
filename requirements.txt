@@ -1,0 +1,12 @@
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+pandas==2.1.4
+numpy==1.26.4
+python-multipart==0.0.7
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+passlib[bcrypt]==1.7.4  # <-- VOLVEMOS A BCRYPT
+bcrypt==3.2.2            # <-- FIJAMOS LA VERSIÓN
+python-jose[cryptography]==3.3.0
+python-dotenv==1.0.1
+email-validator==2.1.0.post1

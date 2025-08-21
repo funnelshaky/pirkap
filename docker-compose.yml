@@ -1,0 +1,54 @@
+services:
+  backend:
+    build: .
+    container_name: blasting_backend
+    restart: unless-stopped
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] # <-- COMANDO SIMPLE
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/code/app
+    env_file:
+      - ./.env
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/blasting_db
+    depends_on: # <-- MODIFICA ESTO
+      db:
+        condition: service_healthy
+
+
+  db:
+    image: postgres:14-alpine
+    container_name: blasting_db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=blasting_db
+    ports:
+      - "5433:5432"
+    healthcheck: # <-- ¡AÑADE ESTA SECCIÓN COMPLETA!
+      test: ["CMD-SHELL", "pg_isready -U user -d blasting_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: blasting_frontend
+    restart: unless-stopped # <-- Y AÑADE ESTO AQUÍ
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+      driver: local # <-- ¡AÑADE ESTA LÍNEA!
